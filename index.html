@@ -690,7 +690,7 @@
         <div class="hero-layout">
           <div class="hero-intro">
             <div class="term-line" style="animation-delay:.1s;"><span class="prompt">$</span><span class="cmd">whoami</span><span class="term-sep">--</span><span class="term-sep">|</span><span class="contact-label" data-i18n="contact-label">contact:</span><span class="social-row">
-          <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=ya33.ali%40icloud.com" target="_blank" rel="noopener" aria-label="Send email">
+          <a id="email-link" href="mailto:ya33.ali@icloud.com" data-gmail-href="https://mail.google.com/mail/u/0/?view=cm&amp;fs=1&amp;to=ya33.ali%40icloud.com" aria-label="Send email">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
           </a>
           <a href="https://wa.me/201070424204" target="_blank" rel="noopener" aria-label="WhatsApp">
@@ -1030,6 +1030,15 @@
   reveals.forEach(r=>io.observe(r));
 
   // cert modals
+  // On phones, use the device's mail composer. On computers, open Gmail directly
+  // to a new message addressed to Youssef.
+  const emailLink = document.getElementById('email-link');
+  if(emailLink && !window.matchMedia('(pointer: coarse)').matches){
+    emailLink.href = emailLink.dataset.gmailHref;
+    emailLink.target = '_blank';
+    emailLink.rel = 'noopener';
+  }
+
   function setCertPage(modal, page){
     modal.querySelectorAll('.modal-page').forEach(p=>{
       p.classList.toggle('active', Number(p.getAttribute('data-page')) === page);
@@ -1059,6 +1068,29 @@
       const modal = dot.closest('.modal-backdrop');
       setCertPage(modal, Number(dot.getAttribute('data-page')));
     });
+  });
+  // Swipe left to view the certificate, and swipe right to return to its details.
+  document.querySelectorAll('.modal-pages').forEach(pages=>{
+    let swipeStartX = null;
+    let swipeStartY = null;
+    pages.addEventListener('touchstart', (e)=>{
+      const touch = e.changedTouches[0];
+      swipeStartX = touch.clientX;
+      swipeStartY = touch.clientY;
+    }, {passive:true});
+    pages.addEventListener('touchend', (e)=>{
+      if(swipeStartX === null || swipeStartY === null) return;
+      const touch = e.changedTouches[0];
+      const moveX = touch.clientX - swipeStartX;
+      const moveY = touch.clientY - swipeStartY;
+      swipeStartX = null;
+      swipeStartY = null;
+      if(Math.abs(moveX) < 50 || Math.abs(moveX) <= Math.abs(moveY)) return;
+      const modal = pages.closest('.modal-backdrop');
+      const activePage = Number(pages.querySelector('.modal-page.active').getAttribute('data-page'));
+      if(moveX < 0) setCertPage(modal, Math.min(activePage + 1, 2));
+      else setCertPage(modal, Math.max(activePage - 1, 1));
+    }, {passive:true});
   });
   document.querySelectorAll('.modal-backdrop').forEach(modal=>{
     modal.addEventListener('click', (e)=>{
