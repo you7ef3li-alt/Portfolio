@@ -804,6 +804,25 @@
   .navlinks .nav-menu{opacity:0; transform:scale(.5); pointer-events:none;
     transition:opacity .4s ease, transform .45s cubic-bezier(.2,1.4,.4,1);}
   .navlinks .nav-menu.show{opacity:1; transform:none; pointer-events:auto;}
+
+  /* hero content waits for the title to finish typing */
+  .hero-stack .term-line, .hero-stack .type-name, .hero-stack .role-line,
+  .hero-stack .hero-skills, .hero-stack .specs{animation-play-state:paused;}
+  body.hero-go .hero-stack .term-line, body.hero-go .hero-stack .type-name, body.hero-go .hero-stack .role-line,
+  body.hero-go .hero-stack .hero-skills, body.hero-go .hero-stack .specs{animation-play-state:running;}
+  .hero-stack .type-name{animation-duration:1s; animation-delay:.3s;}
+  .hero-stack .role-line{animation-delay:1.3s;}
+  .hero-stack .role-line-2{animation-delay:1.6s;}
+  .hero-stack .hero-skills{animation-delay:1.9s;}
+  .hero-stack .specs{animation-delay:2.2s;}
+  @media (prefers-reduced-motion: reduce){
+    .hero-stack .term-line, .hero-stack .role-line, .hero-stack .hero-skills, .hero-stack .specs{opacity:1;}
+  }
+  .about-lead .hl-red{font-size:0.68em; padding:1px 6px; font-weight:600; vertical-align:0.06em;}
+  /* long university name must wrap inside the card on phones */
+  .timeline-card .t-org[data-i18n="bnu-org"]{white-space:normal; overflow-wrap:anywhere; min-width:0; font-size:clamp(13px,3.6vw,15.5px); line-height:1.35;}
+  .tree-root .t-org-group{min-width:0; flex:1 1 0;}
+  .tree-root .timeline-card .t-top{flex-wrap:wrap;}
 </style>
 </head>
 <body>
@@ -1413,17 +1432,18 @@
     const el = document.getElementById('brandTyped');
     if(!el) return;
     const chars = Array.from('🤩 Welcome To My Portofolio');
-    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){ el.textContent = chars.join(''); const cv0 = document.getElementById('cvBtn'); if(cv0) cv0.classList.add('show'); document.querySelectorAll('.navlinks .nav-menu').forEach(m=>m.classList.add('show')); return; }
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){ el.textContent = chars.join(''); document.body.classList.add('hero-go'); const cv0 = document.getElementById('cvBtn'); if(cv0) cv0.classList.add('show'); document.querySelectorAll('.navlinks .nav-menu').forEach(m=>m.classList.add('show')); return; }
     let i = 0;
     const tick = ()=>{
       el.textContent = chars.slice(0, ++i).join('');
-      if(i < chars.length) setTimeout(tick, 85);
+      if(i < chars.length) setTimeout(tick, 52);
       else {
+        setTimeout(()=> document.body.classList.add('hero-go'), 120);
         setTimeout(()=>{ const cv = document.getElementById('cvBtn'); if(cv) cv.classList.add('show'); }, 200);
         setTimeout(()=>{ document.querySelectorAll('.navlinks .nav-menu').forEach(m=>m.classList.add('show')); }, 380);
       }
     };
-    setTimeout(tick, 350);
+    setTimeout(tick, 200);
   })();
 
   // nav links: scroll so the whole section sits in the middle of the viewport
